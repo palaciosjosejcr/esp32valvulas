@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Control Neumático ESP32</title>
+<title>CONTROL ESP32</title>
 
 <style>
 body{
@@ -14,11 +14,11 @@ body{
 }
 
 .container{
-  margin-top:100px;
+  margin-top:80px;
 }
 
 h1{
-  font-size:40px;
+  font-size:42px;
   background: linear-gradient(90deg,#ff00ff,#00ffff);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -47,6 +47,15 @@ button:hover{
   background: linear-gradient(45deg,#00ffff,#0077ff);
   box-shadow:0 0 20px #00ffff;
 }
+
+.qr-box{
+  margin-top:40px;
+}
+
+img{
+  border-radius:12px;
+  box-shadow:0 0 25px #00ffff;
+}
 </style>
 </head>
 
@@ -61,10 +70,21 @@ button:hover{
   <button onclick="sendCommand('2')">Secuencia 2</button><br>
   <button onclick="sendCommand('3')">Secuencia 3</button>
   <button onclick="sendCommand('4')">Secuencia 4</button>
+
+  <div class="qr-box">
+    <h3>Escanea para acceder desde otro dispositivo</h3>
+    <img id="qrImage" width="200">
+  </div>
 </div>
 
 <script>
+// -------- QR AUTOMÁTICO --------
+const urlActual = window.location.href;
+document.getElementById("qrImage").src =
+"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(urlActual);
 
+
+// -------- BLUETOOTH --------
 let bluetoothDevice;
 let characteristic;
 
@@ -82,7 +102,7 @@ async function connectBluetooth(){
     alert("Conectado al ESP32");
   }
   catch(error){
-    alert("Error de conexión: " + error);
+    alert("Error: " + error);
   }
 }
 
@@ -95,7 +115,6 @@ async function sendCommand(value){
   let encoder = new TextEncoder();
   await characteristic.writeValue(encoder.encode(value));
 }
-
 </script>
 
 </body>
