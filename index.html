@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Control Neumático ESP32</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#3b0a63,#1a0033);
+  color:white;
+  text-align:center;
+}
+
+.container{
+  margin-top:100px;
+}
+
+h1{
+  font-size:40px;
+  background: linear-gradient(90deg,#ff00ff,#00ffff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+button{
+  width:200px;
+  height:60px;
+  margin:20px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(45deg,#ff00ff,#7a00ff);
+  color:white;
+  cursor:pointer;
+  box-shadow:0 0 20px #ff00ff;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 30px #00ffff;
+}
+
+.connect{
+  background: linear-gradient(45deg,#00ffff,#0077ff);
+  box-shadow:0 0 20px #00ffff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>CONTROL DE CICLOS</h1>
+
+  <button class="connect" onclick="connectBluetooth()">Conectar Bluetooth</button><br>
+
+  <button onclick="sendCommand('1')">Secuencia 1</button>
+  <button onclick="sendCommand('2')">Secuencia 2</button><br>
+  <button onclick="sendCommand('3')">Secuencia 3</button>
+  <button onclick="sendCommand('4')">Secuencia 4</button>
+</div>
+
+<script>
+
+let bluetoothDevice;
+let characteristic;
+
+async function connectBluetooth(){
+  try{
+    bluetoothDevice = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['12345678-1234-1234-1234-123456789abc']
+    });
+
+    const server = await bluetoothDevice.gatt.connect();
+    const service = await server.getPrimaryService('12345678-1234-1234-1234-123456789abc');
+    characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+
+    alert("Conectado al ESP32");
+  }
+  catch(error){
+    alert("Error de conexión: " + error);
+  }
+}
+
+async function sendCommand(value){
+  if(!characteristic){
+    alert("Primero conecta Bluetooth");
+    return;
+  }
+
+  let encoder = new TextEncoder();
+  await characteristic.writeValue(encoder.encode(value));
+}
+
+</script>
+
+</body>
+</html>
